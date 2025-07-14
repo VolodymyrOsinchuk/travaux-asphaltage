@@ -1,9 +1,11 @@
-[build]
-command = "npm run build"
-publish = "/build"
-base = "/"
-
-[[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
+  build:
+    base: /Users/volodymyr/Documents/Github/travaux-asphaltage
+    command: npm run build
+    commandOrigin: config
+    publish: /Users/volodymyr/Documents/Github/travaux-asphaltage/build
+    publishOrigin: config
+  redirects:
+    - from: /*
+      status: 200
+      to: /index.html
+  redirectsOrigin: config
