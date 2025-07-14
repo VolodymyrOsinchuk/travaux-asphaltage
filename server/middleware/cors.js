@@ -3,12 +3,10 @@ const cors = require('cors')
 
 // Liste des origines autorisées
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:8080',
-  'https://monapp.com',
-  'https://www.monapp.com',
-  'https://app.monapp.com',
+  'http://localhost:5000',
+  'http://localhost:5173',
+  'https://travaux-asphaltage.onrender.com',
+  'https://travaux-asphaltage.netlify.app',
   ...(process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
     : []),
