@@ -25,12 +25,9 @@ import {
   RequestQuote as QuoteIcon,
   Article as BlogIcon,
   AdminPanelSettings as AdminIcon,
-  // Dashboard as DashboardIcon,
-  // Login as LoginIcon,
-  // Close as CloseIcon,
-  // Add as AddIcon,
 } from '@mui/icons-material'
-// import { createTheme } from '@mui/material/styles'
+import Footer from './Footer'
+import Header from './Header'
 
 // Layout Component
 const Layout = () => {
@@ -45,12 +42,12 @@ const Layout = () => {
   }
 
   const menuItems = [
-    { text: 'Home', icon: <HomeIcon />, path: '/' },
+    { text: 'Accueil', icon: <HomeIcon />, path: '/' },
     { text: 'Services', icon: <BusinessIcon />, path: '/services' },
-    { text: 'Projects', icon: <WorkIcon />, path: '/projects' },
-    { text: 'About', icon: <InfoIcon />, path: '/about' },
+    { text: 'Projets', icon: <WorkIcon />, path: '/projects' },
+    { text: 'À Propos', icon: <InfoIcon />, path: '/about' },
     { text: 'Contact', icon: <ContactIcon />, path: '/contact' },
-    { text: 'Quote', icon: <QuoteIcon />, path: '/quote' },
+    { text: 'Devis', icon: <QuoteIcon />, path: '/quote' },
     { text: 'Blog', icon: <BlogIcon />, path: '/blog' },
     { text: 'Admin', icon: <AdminIcon />, path: '/admin' },
   ]
@@ -59,14 +56,14 @@ const Layout = () => {
     <Box sx={{ width: 250 }}>
       <Toolbar>
         <Typography variant="h6" noWrap component="div">
-          My App
+          Travaux Asphaltage
         </Typography>
       </Toolbar>
       <Divider />
       <List>
         {menuItems.map((item) => (
           <ListItem
-            button
+            // button
             key={item.text}
             component={Link}
             to={item.path}
@@ -83,69 +80,31 @@ const Layout = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
-        <Toolbar>
-          {isMobile && (
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Travaux Asphaltage
-          </Typography>
-          {!isMobile && (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              {menuItems.slice(0, -1).map((item) => (
-                <Button
-                  key={item.text}
-                  color="inherit"
-                  component={Link}
-                  to={item.path}
-                  variant={
-                    location.pathname === item.path ? 'outlined' : 'text'
-                  }
-                >
-                  {item.text}
-                </Button>
-              ))}
-            </Box>
-          )}
-        </Toolbar>
-      </AppBar>
+      <Header isMobile={isMobile} handleDrawerToggle={handleDrawerToggle} />
+      {isMobile && (
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: 250,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      )}
 
-      {/* <Drawer
-        variant={isMobile ? 'temporary' : 'permanent'}
-        open={isMobile ? mobileOpen : true}
-        onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          display: { xs: 'block' },
-          '& .MuiDrawer-paper': {
-            boxSizing: 'border-box',
-            width: 250,
-          },
-        }}
-      >
-        {drawer}
-      </Drawer> */}
-
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - 250px)` } }}
-      >
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: '100%' }}>
         <Toolbar />
         <Outlet />
+        <Footer />
       </Box>
     </Box>
   )
