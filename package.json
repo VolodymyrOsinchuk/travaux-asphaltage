@@ -1,0 +1,39 @@
+{
+  "name": "travaux-asphaltage",
+  "version": "1.0.0",
+  "description": "Site web professionnel pour travaux d'asphaltage",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "migrate": "cd server && npm run migrate",
+    "seed": "cd server && npm run seed",
+    "test": "cd server && npm test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "asphaltage",
+    "travaux",
+    "construction",
+    "react",
+    "node.js"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  },
+  "dependencies": {
+    "compression": "^1.8.0",
+    "express-slow-down": "^2.1.0",
+    "rate-limit-redis": "^4.2.1",
+    "react-helmet-async": "^2.0.5"
+  }
+}
