@@ -2,6 +2,30 @@ const { Service } = require('../models')
 const { validationResult } = require('express-validator')
 const { Op } = require('sequelize')
 
+// Fonction utilitaire pour générer un slug
+const generateSlug = (title) => {
+  if (!title) return null
+
+  return (
+    title
+      .toLowerCase()
+      .trim()
+      // Remplacer les accents
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      // Garder seulement les lettres, chiffres, espaces et tirets
+      .replace(/[^a-z0-9\s-]/g, '')
+      // Remplacer les espaces multiples par un seul
+      .replace(/\s+/g, ' ')
+      // Remplacer les espaces par des tirets
+      .replace(/\s/g, '-')
+      // Remplacer les tirets multiples par un seul
+      .replace(/-+/g, '-')
+      // Supprimer les tirets en début et fin
+      .replace(/^-+|-+$/g, '')
+  )
+}
+
 // Obtenir tous les services
 exports.getAllServices = async (req, res) => {
   try {
@@ -10,17 +34,40 @@ exports.getAllServices = async (req, res) => {
       limit = 10,
       category,
       featured,
-      active = true,
+      active,
       search,
       sortBy = 'order',
       sortOrder = 'ASC',
     } = req.query
 
+    console.log('🔍 Query parameters:', req.query)
+
     const offset = (page - 1) * limit
     const whereClause = {}
 
+    // Test simple : récupérer tous les services d'abord
+    const allServices = await Service.findAll()
+    console.log('🔍 All services in database:', allServices.length)
+
+    // Si pas de services, arrêter ici
+    if (allServices.length === 0) {
+      return res.json({
+        success: true,
+        data: {
+          services: [],
+          pagination: {
+            currentPage: parseInt(page),
+            totalPages: 0,
+            totalItems: 0,
+            itemsPerPage: parseInt(limit),
+          },
+        },
+        message: 'Aucun service trouvé dans la base de données',
+      })
+    }
+
     // Filtres
-    if (active !== undefined) {
+    if (active !== undefined && active !== '') {
       whereClause.isActive = active === 'true'
     }
 
@@ -28,7 +75,7 @@ exports.getAllServices = async (req, res) => {
       whereClause.category = category
     }
 
-    if (featured !== undefined) {
+    if (featured !== undefined && featured !== '') {
       whereClause.isFeatured = featured === 'true'
     }
 
@@ -40,27 +87,37 @@ exports.getAllServices = async (req, res) => {
       ]
     }
 
+    console.log('🔍 Where clause:', whereClause)
+
     // Tri
     const orderClause = [[sortBy, sortOrder]]
     if (sortBy !== 'order') {
       orderClause.push(['order', 'ASC'])
     }
 
+    // Requête simplifiée sans include pour tester
     const services = await Service.findAndCountAll({
       where: whereClause,
       order: orderClause,
       limit: parseInt(limit),
       offset: parseInt(offset),
-      include: [
-        {
-          model: require('../models').Project,
-          as: 'projects',
-          attributes: ['id', 'title', 'slug', 'thumbnailImage'],
-          where: { isActive: true },
-          required: false,
-        },
-      ],
+      // Retirer temporairement les includes pour identifier le problème
+      // include: [
+      //   {
+      //     model: require('../models').Project,
+      //     as: 'projects',
+      //     attributes: ['id', 'title', 'slug', 'thumbnailImage'],
+      //     where: { isActive: true },
+      //     required: false,
+      //   },
+      // ],
     })
+
+    console.log('🚀 Services found with filters:', services.count)
+    console.log(
+      '🚀 First service:',
+      services.rows[0] ? services.rows[0].title : 'No services'
+    )
 
     res.json({
       success: true,
@@ -79,6 +136,7 @@ exports.getAllServices = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la récupération des services',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     })
   }
 }
@@ -161,6 +219,33 @@ exports.getServiceBySlug = async (req, res) => {
 }
 
 // Créer un nouveau service
+// Fonction pour générer un slug unique
+const generateUniqueSlug = async (title, excludeId = null) => {
+  const baseSlug = generateSlug(title)
+
+  if (!baseSlug) {
+    throw new Error('Impossible de générer un slug à partir du titre')
+  }
+
+  let uniqueSlug = baseSlug
+  let counter = 1
+
+  const { Op } = require('sequelize')
+
+  const whereClause = { slug: uniqueSlug }
+  if (excludeId) {
+    whereClause.id = { [Op.ne]: excludeId }
+  }
+
+  while (await Service.findOne({ where: whereClause })) {
+    uniqueSlug = `${baseSlug}-${counter}`
+    whereClause.slug = uniqueSlug
+    counter++
+  }
+
+  return uniqueSlug
+}
+
 exports.createService = async (req, res) => {
   try {
     const errors = validationResult(req)
@@ -172,7 +257,22 @@ exports.createService = async (req, res) => {
       })
     }
 
-    const service = await Service.create(req.body)
+    const serviceData = { ...req.body }
+
+    // Générer le slug si il n'est pas fourni
+    if (!serviceData.slug && serviceData.title) {
+      try {
+        serviceData.slug = await generateUniqueSlug(serviceData.title)
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: 'Erreur lors de la génération du slug',
+          error: error.message,
+        })
+      }
+    }
+
+    const service = await Service.create(serviceData)
 
     res.status(201).json({
       success: true,
@@ -183,6 +283,33 @@ exports.createService = async (req, res) => {
     })
   } catch (error) {
     console.error('Erreur lors de la création du service:', error)
+
+    // Gestion des erreurs de validation Sequelize
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Erreurs de validation',
+        errors: error.errors.map((err) => ({
+          field: err.path,
+          message: err.message,
+          value: err.value,
+        })),
+      })
+    }
+
+    // Gestion des erreurs d'unicité
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({
+        success: false,
+        message: 'Conflit de données',
+        errors: error.errors.map((err) => ({
+          field: err.path,
+          message: `${err.path} doit être unique`,
+          value: err.value,
+        })),
+      })
+    }
+
     res.status(500).json({
       success: false,
       message: 'Erreur serveur lors de la création du service',

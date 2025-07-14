@@ -1,4 +1,28 @@
 module.exports = (sequelize, DataTypes) => {
+  // Fonction utilitaire pour générer un slug
+  const generateSlug = (title) => {
+    if (!title) return null
+
+    return (
+      title
+        .toLowerCase()
+        .trim()
+        // Remplacer les accents
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        // Garder seulement les lettres, chiffres, espaces et tirets
+        .replace(/[^a-z0-9\s-]/g, '')
+        // Remplacer les espaces multiples par un seul
+        .replace(/\s+/g, ' ')
+        // Remplacer les espaces par des tirets
+        .replace(/\s/g, '-')
+        // Remplacer les tirets multiples par un seul
+        .replace(/-+/g, '-')
+        // Supprimer les tirets en début et fin
+        .replace(/^-+|-+$/g, '')
+    )
+  }
+
   const Service = sequelize.define(
     'Service',
     {
@@ -134,20 +158,49 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'services',
       timestamps: true,
       hooks: {
-        beforeCreate: (service) => {
-          if (!service.slug) {
-            service.slug = service.title
-              .toLowerCase()
-              .replace(/[^\w\s-]/g, '')
-              .replace(/\s+/g, '-')
+        beforeValidate: async (service) => {
+          // Générer le slug avant la validation si il n'est pas fourni
+          if (!service.slug && service.title) {
+            const baseSlug = generateSlug(service.title)
+
+            if (baseSlug) {
+              // Vérifier l'unicité du slug
+              let uniqueSlug = baseSlug
+              let counter = 1
+
+              while (await Service.findOne({ where: { slug: uniqueSlug } })) {
+                uniqueSlug = `${baseSlug}-${counter}`
+                counter++
+              }
+
+              service.slug = uniqueSlug
+            }
           }
         },
-        beforeUpdate: (service) => {
+        beforeUpdate: async (service) => {
+          // Régénérer le slug si le titre change et qu'aucun slug n'est fourni
           if (service.changed('title') && !service.changed('slug')) {
-            service.slug = service.title
-              .toLowerCase()
-              .replace(/[^\w\s-]/g, '')
-              .replace(/\s+/g, '-')
+            const baseSlug = generateSlug(service.title)
+
+            if (baseSlug) {
+              // Vérifier l'unicité du slug (exclure le service actuel)
+              let uniqueSlug = baseSlug
+              let counter = 1
+
+              while (
+                await Service.findOne({
+                  where: {
+                    slug: uniqueSlug,
+                    id: { [sequelize.Sequelize.Op.ne]: service.id },
+                  },
+                })
+              ) {
+                uniqueSlug = `${baseSlug}-${counter}`
+                counter++
+              }
+
+              service.slug = uniqueSlug
+            }
           }
         },
       },

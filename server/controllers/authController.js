@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 const { User } = require('../models')
 const { sendEmail } = require('../utils/email')
@@ -82,18 +81,18 @@ exports.register = async (req, res) => {
     // Envoyer l'email de vérification
     const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${emailVerificationToken}`
 
-    await sendEmail({
-      to: user.email,
-      subject: 'Vérification de votre adresse email',
-      text: `Bienvenue ! Veuillez vérifier votre adresse email en cliquant sur ce lien: ${verificationUrl}`,
-      html: `
-        <h2>Bienvenue ${user.firstName} !</h2>
-        <p>Merci de vous être inscrit. Veuillez vérifier votre adresse email en cliquant sur le lien ci-dessous :</p>
-        <p><a href="${verificationUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Vérifier mon email</a></p>
-        <p>Ce lien expire dans 24 heures.</p>
-        <p>Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.</p>
-      `,
-    })
+    // await sendEmail({
+    //   to: user.email,
+    //   subject: 'Vérification de votre adresse email',
+    //   text: `Bienvenue ! Veuillez vérifier votre adresse email en cliquant sur ce lien: ${verificationUrl}`,
+    //   html: `
+    //     <h2>Bienvenue ${user.firstName} !</h2>
+    //     <p>Merci de vous être inscrit. Veuillez vérifier votre adresse email en cliquant sur le lien ci-dessous :</p>
+    //     <p><a href="${verificationUrl}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Vérifier mon email</a></p>
+    //     <p>Ce lien expire dans 24 heures.</p>
+    //     <p>Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.</p>
+    //   `,
+    // })
 
     // Supprimer le mot de passe de la réponse
     const userResponse = user.toJSON()
@@ -130,8 +129,10 @@ exports.login = async (req, res) => {
 
     const { email, password } = req.body
 
-    // Rechercher l'utilisateur
-    const user = await User.findOne({ where: { email } })
+    // Rechercher l'utilisateur AVEC le mot de passe
+    const user = await User.scope('withPassword').findOne({
+      where: { email },
+    })
 
     if (!user) {
       return res.status(401).json({

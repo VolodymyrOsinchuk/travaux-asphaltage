@@ -2,6 +2,7 @@ const express = require('express')
 const helmet = require('helmet')
 const compression = require('compression')
 const path = require('path')
+const morgan = require('morgan')
 require('dotenv').config()
 
 // Import des configurations
@@ -17,6 +18,7 @@ const testimonialRoutes = require('./routes/testimonials')
 const contactRoutes = require('./routes/contacts')
 const blogRoutes = require('./routes/blog')
 const uploadRoutes = require('./routes/upload')
+const userRoutes = require('./routes/user')
 
 // Import des middleware personnalisés
 const {
@@ -78,6 +80,11 @@ if (process.env.NODE_ENV !== 'test') {
     next()
   })
 }
+console.log('precess', process.env.NODE_ENV)
+console.log('PORT >>>> ', process.env.PORT)
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'))
+}
 
 // Middleware pour log des rate limits
 app.use(logRateLimitHit)
@@ -131,14 +138,15 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Routes API avec rate limiting spécifique
-app.use('/api', readLimiter, indexRoutes)
-app.use('/api/auth', authLimiter, authRoutes)
-app.use('/api/services', readLimiter, serviceRoutes)
-app.use('/api/projects', readLimiter, projectRoutes)
-app.use('/api/testimonials', readLimiter, testimonialRoutes)
-app.use('/api/contacts', strictLimiter, contactRoutes)
-app.use('/api/blog', readLimiter, blogRoutes)
-app.use('/api/upload', uploadRoutes) // Le rate limiting est géré dans le router
+app.use('/api/v1', readLimiter, indexRoutes)
+app.use('/api/v1/auth', authLimiter, authRoutes)
+app.use('/api/v1/services', readLimiter, serviceRoutes)
+app.use('/api/v1/projects', readLimiter, projectRoutes)
+app.use('/api/v1/testimonials', readLimiter, testimonialRoutes)
+app.use('/api/v1/contacts', strictLimiter, contactRoutes)
+app.use('/api/v1/blog', readLimiter, blogRoutes)
+app.use('/api/v1/upload', uploadRoutes) // Le rate limiting est géré dans le router
+app.use('/api/v1/users', userRoutes) // Le rate limiting est géré dans le router
 
 app.get('/', (req, res) => {
   res.send('Hello from backend travaux asphaltage')

@@ -16,6 +16,8 @@ const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
 
+import { loader as serviceLoader } from './pages/Services'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -29,6 +31,7 @@ const router = createBrowserRouter([
       {
         path: 'services',
         element: <Services />,
+        loader: serviceLoader,
       },
       {
         path: 'projects',

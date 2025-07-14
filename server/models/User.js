@@ -73,7 +73,7 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
       refreshToken: {
-        type: DataTypes.STRING(1000),
+        type: DataTypes.TEXT,
         allowNull: true,
       },
       resetPasswordToken: {
