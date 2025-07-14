@@ -26,7 +26,7 @@ const BlogModel = (sequelize, DataTypes) => {
         },
       },
       excerpt: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: false,
         validate: {
           len: [20, 500],
@@ -34,7 +34,7 @@ const BlogModel = (sequelize, DataTypes) => {
         },
       },
       content: {
-        type: DataTypes.TEXT('long'),
+        type: DataTypes.STRING(1000),
         allowNull: false,
         validate: {
           len: [100, 50000],

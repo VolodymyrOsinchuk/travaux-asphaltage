@@ -33,7 +33,7 @@ const QuoteModel = (sequelize, DataTypes) => {
         allowNull: true,
       },
       projectDescription: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: false,
         validate: {
           len: [20, 2000],
@@ -76,7 +76,7 @@ const QuoteModel = (sequelize, DataTypes) => {
         defaultValue: [],
       },
       additionalInfo: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
       },
       status: {
@@ -100,7 +100,7 @@ const QuoteModel = (sequelize, DataTypes) => {
         allowNull: true,
       },
       notes: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
         comment: 'Notes internes',
       },

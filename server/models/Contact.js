@@ -53,7 +53,7 @@ const ContactModel = (sequelize) => {
         },
       },
       message: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: false,
         validate: {
           len: [10, 2000],
@@ -113,7 +113,7 @@ const ContactModel = (sequelize) => {
         defaultValue: false,
       },
       notes: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
         comment: 'Notes internes pour le suivi',
       },
@@ -123,7 +123,7 @@ const ContactModel = (sequelize) => {
         comment: 'IP address du client (IPv4 ou IPv6)',
       },
       userAgent: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
         comment: 'User agent du navigateur',
       },

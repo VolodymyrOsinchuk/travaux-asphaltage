@@ -140,6 +140,10 @@ app.use('/api/contacts', strictLimiter, contactRoutes)
 app.use('/api/blog', readLimiter, blogRoutes)
 app.use('/api/upload', uploadRoutes) // Le rate limiting est géré dans le router
 
+app.get('/', (req, res) => {
+  res.send('Hello from backend travaux asphaltage')
+})
+
 // Route de santé (sans rate limiting)
 app.get('/health', (req, res) => {
   res.status(200).json({

@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       description: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: false,
         validate: {
           len: [10, 2000],
@@ -157,17 +157,17 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: [],
       },
       challenges: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
         comment: 'Défis rencontrés',
       },
       solutions: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
         comment: 'Solutions apportées',
       },
       results: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: true,
         comment: 'Résultats obtenus',
       },

@@ -33,7 +33,7 @@ const TestimonialModel = (sequelize, DataTypes) => {
         allowNull: true,
       },
       testimonialText: {
-        type: DataTypes.TEXT,
+        type: DataTypes.STRING(1000),
         allowNull: false,
         validate: {
           len: [10, 1000],
