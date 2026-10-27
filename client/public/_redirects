@@ -1,0 +1,7 @@
+# Netlify _redirects — Fallback SPA pour React Router
+# Toutes les routes frontend retombent sur index.html pour que
+# le routeur React gère la navigation (accès direct, recharge, lien partagé).
+# Les fichiers physiques existants (assets, images, etc.) sont servis en priorité
+# par Netlify avant d'appliquer cette règle.
+
+/*    /index.html   200

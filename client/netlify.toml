@@ -14,19 +14,11 @@
   command = "npm run dev"
   port = 5173
 
-# Redirections pour un SPA (React Router) — toutes les routes non-statiques
-# retombent sur index.html pour que le routing côté client fonctionne.
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  conditions = {Path = ["!/assets/*", "!/*.json", "!/*.ico", "!/*.svg", "!/*.png", "!/*.jpg", "!/*.webp", "!/*.woff*", "!/*.ttf", "!/*.eot"]}
-
-# Proxy optionnel vers l'API backend (décommenter et adapter l'URL en production)
-# [[redirects]]
-#   from = "/api/*"
-#   to = "https://VOTRE-SERVEUR.netlify.app/:splat"
-#   status = 200
+# Redirections pour un SPA (React Router)
+# Géré par le fichier public/_redirects (copié dans dist/ à la build).
+# Règle : /* -> /index.html (200) pour toutes les routes frontend.
+# Les routes API sont appelées directement sur le backend Render,
+# aucun proxy n'est nécessaire ici.
 
 # Headers de sécurité et de cache
 [[headers]]
