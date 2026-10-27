@@ -1,7 +1,42 @@
-[build]
-  base = "client"
-  command = "npm run build"
-  publish = "dist"
+# netlify.toml — configuration pour le client (SPA Vite + React)
+# À placer à la racine du dossier client/
 
-[build.environment]
-  NODE_VERSION = "24"
+[build]
+  # Commande de build exécutée par Netlify
+  command = "npm run build"
+  # Dossier publié (Vite génère par défaut un dossier "dist")
+  publish = "dist"
+  # Dossier racine du projet client (utile si le toml est à la racine du monorepo)
+  # base = "client"
+
+[dev]
+  # Commande pour le serveur de développement local Netlify
+  command = "npm run dev"
+  port = 5173
+
+# Redirections pour un SPA (React Router)
+# Géré par le fichier public/_redirects (copié dans dist/ à la build).
+# Règle : /* -> /index.html (200) pour toutes les routes frontend.
+# Les routes API sont appelées directement sur le backend Render,
+# aucun proxy n'est nécessaire ici.
+
+# Headers de sécurité et de cache
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache agressif des assets statiques (générés par Vite avec hash dans le nom)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache court du HTML d'entrée
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
