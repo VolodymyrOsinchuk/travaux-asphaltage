@@ -19,6 +19,7 @@ const contactRoutes = require('./routes/contacts')
 const blogRoutes = require('./routes/blog')
 const uploadRoutes = require('./routes/upload')
 const userRoutes = require('./routes/user')
+const quoteRoutes = require('./routes/quotes')
 
 // Import des middleware personnalisés
 const {
@@ -80,7 +81,7 @@ if (process.env.NODE_ENV !== 'test') {
     next()
   })
 }
-console.log('precess', process.env.NODE_ENV)
+console.log('process', process.env.NODE_ENV)
 console.log('PORT >>>> ', process.env.PORT)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
@@ -147,6 +148,7 @@ app.use('/api/v1/contacts', strictLimiter, contactRoutes)
 app.use('/api/v1/blog', readLimiter, blogRoutes)
 app.use('/api/v1/upload', uploadRoutes) // Le rate limiting est géré dans le router
 app.use('/api/v1/users', userRoutes) // Le rate limiting est géré dans le router
+app.use('/api/v1/quotes', quoteRoutes) // Demandes de devis
 
 app.get('/', (req, res) => {
   res.send('Hello from backend travaux asphaltage')

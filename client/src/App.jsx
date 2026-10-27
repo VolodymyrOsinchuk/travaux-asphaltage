@@ -11,6 +11,7 @@ const Contact = lazy(() => import('./pages/Contact'))
 const Quote = lazy(() => import('./pages/Quote'))
 const Blog = lazy(() => import('./pages/Blog'))
 const BlogPost = lazy(() => import('./pages/BlogPost'))
+const ServiceDetail = lazy(() => import('./pages/ServiceDetail'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
@@ -32,6 +33,22 @@ const router = createBrowserRouter([
         path: 'services',
         element: <Services />,
         loader: serviceLoader,
+      },
+      {
+        path: 'services/:slug',
+        element: <ServiceDetail />,
+        loader: async ({ params }) => {
+          try {
+            const { ServicesAPI } = await import('./services/serviceService')
+            const data = await ServicesAPI.getServiceBySlug(params.slug)
+            return { service: data.data?.service || data, error: null }
+          } catch (error) {
+            return {
+              service: null,
+              error: error.message || 'Service non trouvé',
+            }
+          }
+        },
       },
       {
         path: 'projects',

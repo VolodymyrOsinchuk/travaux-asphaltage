@@ -5,7 +5,7 @@ const fs = require('fs')
 
 // Configuration de la base de données
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: process.env.DB_DIALECT || 'postgress',
+  dialect: process.env.DB_DIALECT || 'postgres',
   dialectOptions: {
     ssl: {
       require: true,

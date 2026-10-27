@@ -28,12 +28,12 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "concurrently": "^9.2.0"
+    "concurrently": "^10.0.6"
   },
   "dependencies": {
-    "compression": "^1.8.0",
-    "express-slow-down": "^2.1.0",
-    "rate-limit-redis": "^4.2.1",
-    "react-helmet-async": "^2.0.5"
+    "compression": "^1.8.2",
+    "express-slow-down": "^3.1.1",
+    "rate-limit-redis": "^6.0.1",
+    "react-helmet-async": "^3.0.0"
   }
 }

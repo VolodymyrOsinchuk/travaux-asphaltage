@@ -63,7 +63,7 @@ router.get(
   '/stats',
   readLimiter,
   authenticateToken,
-  requireRole('admin', 'editor'),
+  requireRole(['admin', 'editor']),
   getBlogStats
 )
 
@@ -109,7 +109,7 @@ router.post(
   '/',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor', 'author'),
+  requireRole(['admin', 'editor', 'author']),
   validateCreatePost,
   createPost
 )
@@ -119,7 +119,7 @@ router.put(
   '/:id',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor', 'author'),
+  requireRole(['admin', 'editor', 'author']),
   validatePostId,
   validateUpdatePost,
   checkPostOwnership,
@@ -131,7 +131,7 @@ router.delete(
   '/:id',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor', 'author'),
+  requireRole(['admin', 'editor', 'author']),
   validatePostId,
   checkPostOwnership,
   deletePost
@@ -142,7 +142,7 @@ router.patch(
   '/:id/status',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor', 'author'),
+  requireRole(['admin', 'editor', 'author']),
   validatePostId,
   checkPostOwnership,
   togglePostStatus
@@ -157,7 +157,7 @@ router.patch(
   '/:id/featured',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor'),
+  requireRole(['admin', 'editor']),
   validatePostId,
   async (req, res) => {
     try {
@@ -207,7 +207,7 @@ router.post(
   '/:id/publish',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor'),
+  requireRole(['admin', 'editor']),
   validatePostId,
   async (req, res) => {
     try {
@@ -255,7 +255,7 @@ router.post(
   '/:id/unpublish',
   strictLimiter,
   authenticateToken,
-  requireRole('admin', 'editor'),
+  requireRole(['admin', 'editor']),
   validatePostId,
   async (req, res) => {
     try {

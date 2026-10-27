@@ -160,6 +160,54 @@ router.get('/', queryValidation, optionalAuth, getAllServices)
 
 router.get('/categories', getServiceCategories)
 
+router.get('/search/:query', param('query')
+    .isLength({ min: 2, max: 100 })
+    .withMessage(
+      'La requête de recherche doit contenir entre 2 et 100 caractères'
+    )
+    .trim(),
+  queryValidation,
+  optionalAuth,
+  async (req, res) => {
+    try {
+      const { Service } = require('../models')
+      const { query } = req.params
+      const {
+        page = 1,
+        limit = 10,
+        sortBy = 'order',
+        sortOrder = 'ASC',
+      } = req.query
+
+      const offset = (page - 1) * limit
+
+      const services = await Service.searchServices(query)
+
+      // Pagination manuelle pour la méthode de recherche
+      const totalItems = services.length
+      const paginatedServices = services.slice(offset, offset + parseInt(limit))
+
+      res.json({
+        success: true,
+        data: {
+          services: paginatedServices,
+          pagination: {
+            currentPage: parseInt(page),
+            totalPages: Math.ceil(totalItems / limit),
+            totalItems,
+            itemsPerPage: parseInt(limit),
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error)
+      res.status(500).json({
+        success: false,
+        message: 'Erreur serveur lors de la recherche',
+      })
+    }
+  })
+
 router.get('/slug/:slug', slugValidation, optionalAuth, getServiceBySlug)
 
 router.get('/:id', paramValidation, optionalAuth, getServiceById)

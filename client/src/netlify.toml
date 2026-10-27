@@ -1,6 +1,6 @@
 [build]
 command = "npm run build"
-publish = "/"
+publish = "/dist"
 base = "/"
 
 
@@ -8,4 +8,3 @@ base = "/"
 from = "/*"
 status = 200
 to = "/index.html"
-redirectsOrigin: "config"

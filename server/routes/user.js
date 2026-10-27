@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { body, param, query } = require('express-validator')
+const { body, param, query, validationResult } = require('express-validator')
 const { Op } = require('sequelize') // Import Op for bulk operations
 const rateLimit = require('express-rate-limit')
 

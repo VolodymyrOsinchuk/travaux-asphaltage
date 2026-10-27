@@ -7,12 +7,14 @@ import {
   Grid,
   TextField,
   Paper,
+  Alert,
 } from '@mui/material'
 import {
   Phone as PhoneIcon,
   Email as EmailIcon,
   LocationOn as LocationIcon,
 } from '@mui/icons-material'
+import customFetch from '../utils/customFetch'
 // Page Contact
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +22,8 @@ const Contact = () => {
     email: '',
     message: '',
   })
+  const [submitStatus, setSubmitStatus] = useState(null) // 'idle' | 'submitting' | 'success' | 'error'
+  const [submitError, setSubmitError] = useState(null)
 
   const handleChange = (e) => {
     setFormData({
@@ -28,10 +32,26 @@ const Contact = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    // Logique d'envoi du formulaire
+    setSubmitStatus('submitting')
+    setSubmitError(null)
+    try {
+      await customFetch.post('/contacts', {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        subject: 'Demande de contact depuis le site',
+      })
+      setSubmitStatus('success')
+    } catch (error) {
+      setSubmitStatus('error')
+      setSubmitError(
+        error.response?.data?.message ||
+          error.message ||
+          'Une erreur est survenue lors de l\'envoi du message.'
+      )
+    }
   }
 
   return (
@@ -82,8 +102,23 @@ const Contact = () => {
                   />
                 </Grid>
                 <Grid size={12}>
-                  <Button type="submit" variant="contained" size="large">
-                    Envoyer
+                  {submitStatus === 'success' && (
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      Votre message a été envoyé avec succès !
+                    </Alert>
+                  )}
+                  {submitStatus === 'error' && submitError && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                      {submitError}
+                    </Alert>
+                  )}
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    disabled={submitStatus === 'submitting'}
+                  >
+                    {submitStatus === 'submitting' ? 'Envoi en cours...' : 'Envoyer'}
                   </Button>
                 </Grid>
               </Grid>

@@ -27,7 +27,9 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Alert,
 } from '@mui/material'
+import customFetch from '../utils/customFetch'
 import {
   AddRoad,
   AttachMoney,
@@ -66,6 +68,7 @@ const Quote = () => {
 
   const [hoveredCard, setHoveredCard] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState(null)
 
   const projectTypes = [
     {
@@ -129,10 +132,28 @@ const Quote = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    // Simulation d'envoi
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsSubmitting(false)
-    setActiveStep(steps.length)
+    setSubmitError(null)
+    try {
+      await customFetch.post('/quotes', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company,
+        projectDescription: `${formData.description}\n\nSurface: ${formData.surface} m²\nAdresse: ${formData.address}\nUrgence: ${formData.urgency}`,
+        budget: formData.budget,
+        timeline: formData.deadline,
+        projectType: formData.projectType,
+      })
+      setIsSubmitting(false)
+      setActiveStep(steps.length)
+    } catch (error) {
+      setIsSubmitting(false)
+      setSubmitError(
+        error.response?.data?.message ||
+          error.message ||
+          'Une erreur est survenue lors de l\'envoi de votre demande de devis.'
+      )
+    }
   }
 
   const getStepContent = (step) => {
@@ -699,6 +720,11 @@ const Quote = () => {
       </Slide>
 
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
+        {submitError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {submitError}
+          </Alert>
+        )}
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((label, index) => (
             <Step key={label}>

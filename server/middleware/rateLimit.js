@@ -1,5 +1,5 @@
 // middleware/rateLimit.js
-const rateLimit = require('express-rate-limit')
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit')
 const slowDown = require('express-slow-down')
 
 // IPs de confiance
@@ -37,7 +37,7 @@ const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip,
+  keyGenerator: ipKeyGenerator,
   skip: skipTrustedIPs,
   handler: (req, res) => {
     res.status(429).json({
@@ -60,7 +60,7 @@ const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip + ':auth',
+  keyGenerator: (req) => ipKeyGenerator(req) + ':auth',
   skipSuccessfulRequests: true,
   skip: skipTrustedIPs,
   handler: (req, res) => {
@@ -84,7 +84,7 @@ const readLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip + ':read',
+  keyGenerator: (req) => ipKeyGenerator(req) + ':read',
   skip: skipTrustedIPs,
   handler: (req, res) => {
     res.status(429).json({
@@ -107,7 +107,7 @@ const strictLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip + ':strict',
+  keyGenerator: (req) => ipKeyGenerator(req) + ':strict',
   skip: skipTrustedIPs,
   handler: (req, res) => {
     res.status(429).json({
@@ -130,7 +130,7 @@ const uploadLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip + ':upload',
+  keyGenerator: (req) => ipKeyGenerator(req) + ':upload',
   skip: skipTrustedIPs,
   handler: (req, res) => {
     res.status(429).json({
@@ -152,7 +152,7 @@ const heavyLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip + ':heavy',
+  keyGenerator: (req) => ipKeyGenerator(req) + ':heavy',
   skip: skipTrustedIPs,
   handler: (req, res) => {
     res.status(429).json({
@@ -169,7 +169,7 @@ const speedLimiter = slowDown({
   delayAfter: 50, // Commencer à ralentir après 50 requêtes
   delayMs: false, // Délai initial de 500ms
   maxDelayMs: 20000, // Délai maximum de 20 secondes
-  keyGenerator: (req) => req.ip,
+  keyGenerator: ipKeyGenerator,
   skip: skipTrustedIPs,
 })
 
