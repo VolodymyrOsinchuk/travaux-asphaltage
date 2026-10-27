@@ -15,7 +15,8 @@
     "seed": "cd server && npm run seed",
     "test": "cd server && npm test",
     "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "postinstall": "cd client && npm install"
   },
   "keywords": [
     "asphaltage",
